@@ -11,6 +11,7 @@ const notificationType: NotificationType = [
   'server-chan',
   'bark',
   'wecom',
+  'satori',
 ];
 
 const items: SettingItem<Notification>[] = [
@@ -30,6 +31,33 @@ const items: SettingItem<Notification>[] = [
     },
   },
   {
+    configKey: 'base_url',
+    label: () => t('config.notification_set.base_url'),
+    type: 'input',
+    prop: {
+      type: 'text',
+      placeholder: 'base url',
+    },
+  },
+  {
+    configKey: 'self_id',
+    label: () => t('config.notification_set.self_id'),
+    type: 'input',
+    prop: {
+      type: 'text',
+      placeholder: 'self id',
+    },
+  },
+  {
+    configKey: 'platform',
+    label: () => t('config.notification_set.platform'),
+    type: 'input',
+    prop: {
+      type: 'text',
+      placeholder: 'platform',
+    },
+  },
+  {
     configKey: 'token',
     label: () => t('config.notification_set.token'),
     type: 'input',
@@ -46,19 +74,15 @@ const items: SettingItem<Notification>[] = [
       type: 'text',
       placeholder: 'chat id',
     },
-  },
+  }
 ];
 </script>
 
 <template>
   <ab-fold-panel :title="$t('config.notification_set.title')">
     <div space-y-12>
-      <ab-setting
-        v-for="i in items"
-        :key="i.configKey"
-        v-bind="i"
-        v-model:data="notification[i.configKey]"
-      ></ab-setting>
+      <ab-setting v-for="i in items" :key="i.configKey" v-bind="i"
+        v-model:data="notification[i.configKey]"></ab-setting>
     </div>
   </ab-fold-panel>
 </template>

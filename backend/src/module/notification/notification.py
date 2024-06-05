@@ -9,6 +9,7 @@ from .plugin import (
     ServerChanNotification,
     TelegramNotification,
     WecomNotification,
+    SatoriNotification,
 )
 
 logger = logging.getLogger(__name__)
@@ -23,6 +24,8 @@ def getClient(type: str):
         return BarkNotification
     elif type.lower() == "wecom":
         return WecomNotification
+    elif type.lower() == "satori":
+        return SatoriNotification
     else:
         return None
 
@@ -31,7 +34,11 @@ class PostNotification:
     def __init__(self):
         Notifier = getClient(settings.notification.type)
         self.notifier = Notifier(
-            token=settings.notification.token, chat_id=settings.notification.chat_id
+            token=settings.notification.token,
+            chat_id=settings.notification.chat_id,
+            base_url=settings.notification.base_url,
+            self_id=settings.notification.self_id,
+            platform=settings.notification.platform,
         )
 
     @staticmethod

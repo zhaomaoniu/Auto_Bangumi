@@ -1,0 +1,68 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>{{ anime_title }} Episodes</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 20px;
+            background-color: #f9f9f9;
+        }
+        .container {
+            max-width: 800px;
+            margin: 0 auto;
+            background: #fff;
+            padding: 20px;
+            border-radius: 10px;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+        }
+        h1 {
+            text-align: center;
+            color: #333;
+        }
+        .episode-list {
+            list-style: none;
+            padding: 0;
+        }
+        .episode-item {
+            margin: 10px 0;
+            padding: 10px;
+            border-bottom: 1px solid #ddd;
+        }
+        .episode-item a {
+            text-decoration: none;
+            color: #0066cc;
+        }
+        .episode-item a:hover {
+            text-decoration: underline;
+        }
+        .back-button {
+            display: block;
+            margin: 20px 0;
+            padding: 10px 20px;
+            text-align: center;
+            background-color: #0066cc;
+            color: white;
+            text-decoration: none;
+            border-radius: 5px;
+        }
+        .back-button:hover {
+            background-color: #0055aa;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>{{ anime_title }}</h1>
+        <a href="{{ back_link }}" class="back-button">Back to List</a>
+        <ul class="episode-list">
+            {% for episode in episodes %}
+            <li class="episode-item">
+                <a href="{{ episode.link }}">{{ episode.title }}</a>
+            </li>
+            {% endfor %}
+        </ul>
+    </div>
+</body>
+</html>

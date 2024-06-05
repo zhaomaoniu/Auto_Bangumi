@@ -1,0 +1,47 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <!-- <title>Bangumi List</title> -->
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+        }
+        .anime-list {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 20px;
+            justify-content: center;
+        }
+        .anime-item {
+            text-align: center;
+            width: 200px;
+        }
+        .anime-item img {
+            width: 100%;
+            height: auto;
+            border-radius: 10px;
+        }
+        .anime-item h3 {
+            font-size: 1.2em;
+            margin: 10px 0;
+        }
+        .anime-item a {
+            text-decoration: none;
+            color: inherit;
+        }
+    </style>
+</head>
+<body>
+    <!-- <h1>Bangumi List</h1> -->
+    <div class="anime-list">
+        {% for anime in animes %}
+        <div class="anime-item">
+            <a href="/api/v1/media/{{ anime.id }}">
+                <img src="/{{ anime.poster_link }}" alt="{{ anime.official_title }}">
+                <h3>{{ anime.official_title }}</h3>
+            </a>
+        </div>
+        {% endfor %}
+    </div>
+</body>
+</html>

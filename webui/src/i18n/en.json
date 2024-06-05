@@ -47,6 +47,9 @@
       "enable": "Enable",
       "title": "Notification Setting",
       "token": "Token",
+      "base_url": "Base URL",
+      "self_id": "Self ID",
+      "platform": "Platform",
       "type": "Type"
     },
     "parser_set": {

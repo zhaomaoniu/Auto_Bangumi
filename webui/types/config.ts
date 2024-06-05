@@ -43,7 +43,10 @@ export interface Config {
   };
   notification: {
     enable: boolean;
-    type: 'telegram' | 'server-chan' | 'bark' | 'wecom';
+    type: 'telegram' | 'server-chan' | 'bark' | 'wecom' | 'satori';
+    base_url: string;
+    self_id: string;
+    platform: string;
     token: string;
     chat_id: string;
   };
@@ -103,6 +106,9 @@ export const initConfig: Config = {
   notification: {
     enable: false,
     type: 'telegram',
+    base_url: '',
+    self_id: '',
+    platform: '',
     token: '',
     chat_id: '',
   },

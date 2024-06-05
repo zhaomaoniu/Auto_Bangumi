@@ -43,7 +43,15 @@ DEFAULT_SETTINGS = {
         "username": "",
         "password": "",
     },
-    "notification": {"enable": False, "type": "telegram", "token": "", "chat_id": ""},
+    "notification": {
+        "enable": False,
+        "type": "telegram",
+        "base_url": "",
+        "self_id": "",
+        "platform": "",
+        "token": "",
+        "chat_id": "",
+    },
 }
 
 

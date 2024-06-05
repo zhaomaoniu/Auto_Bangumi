@@ -8,7 +8,7 @@ logger = logging.getLogger(__name__)
 
 
 class TelegramNotification(RequestContent):
-    def __init__(self, token, chat_id):
+    def __init__(self, token, chat_id, **kwargs):
         super().__init__()
         self.photo_url = f"https://api.telegram.org/bot{token}/sendPhoto"
         self.message_url = f"https://api.telegram.org/bot{token}/sendMessage"

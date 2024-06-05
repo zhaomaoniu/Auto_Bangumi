@@ -73,6 +73,9 @@ class Notification(BaseModel):
     type: str = Field("telegram", description="Notification type")
     token_: str = Field("", alias="token", description="Notification token")
     chat_id_: str = Field("", alias="chat_id", description="Notification chat id")
+    base_url: str = Field("", description="Notification base url")
+    self_id: str = Field("", description="Notification self id")
+    platform: str = Field("", description="Notification platform")
 
     @property
     def token(self):

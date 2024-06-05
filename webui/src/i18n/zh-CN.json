@@ -47,6 +47,9 @@
       "enable": "启用",
       "title": "通知设置",
       "token": "Token",
+      "base_url": "Base URL",
+      "self_id": "Self ID",
+      "platform": "平台",
       "type": "类型"
     },
     "parser_set": {
