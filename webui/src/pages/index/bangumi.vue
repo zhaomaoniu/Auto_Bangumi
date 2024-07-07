@@ -15,7 +15,7 @@ onActivated(() => {
 </script>
 
 <template>
-  <div overflow-auto mt-12 flex-grow>
+  <div class="bangumi-container overflow-auto mt-12 flex-grow">
     <div>
       <transition-group
         name="bangumi"
@@ -47,7 +47,14 @@ onActivated(() => {
   </div>
 </template>
 
-<style>
+<style scoped>
+.bangumi-container {
+  flex-direction: column;
+  width: 100%;
+  padding: 16px;
+  text-align: left;
+  max-width: none;
+}
 .bangumi-enter-active,
 .bangumi-leave-active {
   transition: all 0.5s ease;

@@ -8,8 +8,6 @@ const { media } = storeToRefs(useMediaStore());
 const { getAll } = useBangumiStore();
 const { getEpisodes } = useMediaStore();
 
-const { isMobile } = useBreakpointQuery();
-
 const currentView = ref<'bangumiList' | 'episodeList' | 'player'>('bangumiList');
 const selectedBangumiId = ref<number | null>(null);
 const selectedEpisodeLink = ref<string | null>(null);
@@ -17,6 +15,15 @@ const selectedEpisodeLink = ref<string | null>(null);
 onActivated(() => {
   getAll();
 });
+
+// 通过文件名获取集数, 例如: Oshinoko S02E01.mp4 => 1, S02E02.mp4 => 2
+const getEpisodeNumber = (fileName: string) => {
+  const match = fileName.match(/S(\d+)E(\d+)/);
+  if (match) {
+    return parseInt(match[2]);
+  }
+  return 0;
+};
 
 // 切换到选集界面
 const selectBangumi = (bangumiId: number) => {
@@ -74,7 +81,7 @@ const backToList = () => {
           class="episode-item"
           @click="() => selectEpisode(episode.link)"
         >
-          {{ episode.title }}
+          {{ getEpisodeNumber(episode.title) }}
         </div>
       </transition-group>
     </div>
@@ -175,8 +182,8 @@ const backToList = () => {
   display: flex;
   align-items: center;
   justify-content: center;
-  width: 150px;
-  height: 85px;
+  width: 60px;
+  height: 60px;
   background: #f3f3f3; /* 背景颜色 */
   border: 1px solid #ba68c8; /* 边框颜色 */
   border-radius: 8px;
