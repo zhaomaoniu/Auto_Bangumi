@@ -9,7 +9,7 @@ export const apiMedia = {
      */
     async getEpisodes(bangumiId: number) {
         const { data } = await axios.get<BasicEpisodeRule[]>(
-            `api/v1/_media/get/${bangumiId}`
+            `api/v1/media/get/${bangumiId}`
         );
         return data;
     }

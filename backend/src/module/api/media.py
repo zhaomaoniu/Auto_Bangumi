@@ -1,29 +1,30 @@
 from typing import List
 from pathlib import Path
-from fastapi import APIRouter, Request
-from fastapi.responses import HTMLResponse, StreamingResponse
-from fastapi.templating import Jinja2Templates
 
-from module.conf import settings
-from module.models import Bangumi
+from fastapi.responses import StreamingResponse
+from fastapi import APIRouter, Request, Response, Depends
+
+from module.models import BasicEpisode
 from module.manager import TorrentManager
-
+from module.security.api import get_current_user
 
 router = APIRouter(prefix="/media", tags=["media"])
-templates = Jinja2Templates(directory=str(Path(__file__).parent.parent / "templates"))
 
 
-def get_all_bangumi() -> List[Bangumi]:
+@router.get(
+    "/get/{bangumi_id}",
+    response_model=list[BasicEpisode],
+    dependencies=[Depends(get_current_user)],
+)
+def get_episodes_data(bangumi_id: int) -> List[BasicEpisode]:
+    """获取指定番剧的所有剧集信息"""
     with TorrentManager() as manager:
-        return sorted(manager.bangumi.search_all(), key=lambda x: x.id, reverse=True)
+        bangumi = manager.bangumi.search_id(bangumi_id)
 
-
-def gen_episodes_data(bangumi: Bangumi) -> List[dict]:
-    if bangumi.save_path is None:
+    if bangumi is None or bangumi.save_path is None:
         return []
 
     path = Path(bangumi.save_path)
-
     if not path.exists():
         return []
 
@@ -31,134 +32,26 @@ def gen_episodes_data(bangumi: Bangumi) -> List[dict]:
     for episode_path in path.iterdir():
         if episode_path.is_file():
             episodes.append(
-                {
-                    "number": (
-                        episode_path.stem.split()[-1]
-                        if settings.bangumi_manage.rename_method != "none"
-                        else episode_path.stem
-                    ),
-                    "title": episode_path.name,
-                    "link": f"/api/v1/media/{bangumi.id}/episodes/{episode_path.stem}",
-                }
+                BasicEpisode(
+                    title=episode_path.name,
+                    link=f"/api/v1/media/get/{bangumi.id}/episodes/{episode_path.stem}",
+                )
             )
 
-    return sorted(episodes, key=lambda x: x["number"])
+    return episodes
 
 
-@router.get("/", response_class=HTMLResponse)
-def get_all_bangumi_info(request: Request):
-    return templates.TemplateResponse(
-        "index.html",
-        {
-            "request": request,
-            "animes": [bangumi.dict() for bangumi in get_all_bangumi()],
-        },
-    )
-
-
-@router.get("/{bangumi_id}", response_class=HTMLResponse)
-def get_bangumi_info(request: Request, bangumi_id: int):
-    with TorrentManager() as manager:
-        bangumi = manager.bangumi.search_id(bangumi_id)
-
-    if bangumi is None:
-        return templates.TemplateResponse(
-            "not_found.html",
-            {
-                "request": request,
-            },
-        )
-
-    return templates.TemplateResponse(
-        "episode.html",
-        {
-            "request": request,
-            "episodes": gen_episodes_data(bangumi),
-            "back_link": "/api/v1/media/",
-        },
-    )
-
-
-@router.get("/{bangumi_id}/episodes/{episode_id}", response_class=HTMLResponse)
-def get_episode_info(request: Request, bangumi_id: int, episode_id: str):
-    with TorrentManager() as manager:
-        bangumi = manager.bangumi.search_id(bangumi_id)
-
-    if bangumi is None:
-        return templates.TemplateResponse(
-            "not_found.html",
-            {
-                "request": request,
-            },
-        )
-
-    if bangumi.save_path is None:
-        return templates.TemplateResponse(
-            "not_found.html",
-            {
-                "request": request,
-            },
-        )
-
-    episode_path = None
-
-    for file in Path(bangumi.save_path).iterdir():
-        if file.stem == episode_id:
-            episode_path = file
-
-    if episode_path is None:
-        return templates.TemplateResponse(
-            "not_found.html",
-            {
-                "request": request,
-            },
-        )
-
-    if not episode_path.exists():
-        return templates.TemplateResponse(
-            "not_found.html",
-            {
-                "request": request,
-            },
-        )
-
-    return templates.TemplateResponse(
-        "display.html",
-        {
-            "request": request,
-            "anime_title": bangumi.official_title,
-            "episode_number": (
-                episode_path.stem.split()[-1]
-                if settings.bangumi_manage.rename_method != "none"
-                else episode_path.stem
-            ),
-            "episode_title": episode_path.name,
-            "video_link": f"/api/v1/media/res/{bangumi_id}/episodes/{episode_path.stem}",
-            "back_link": f"/api/v1/media/{bangumi_id}/",
-        },
-    )
-
-
-@router.get("/res/{bangumi_id}/episodes/{episode_id}")
+@router.get(
+    "/get/{bangumi_id}/episodes/{episode_id}",
+    response_class=StreamingResponse,
+    dependencies=[Depends(get_current_user)],
+)
 async def anime_res(request: Request, bangumi_id: int, episode_id: str):
     with TorrentManager() as manager:
         bangumi = manager.bangumi.search_id(bangumi_id)
 
-    if bangumi is None:
-        return templates.TemplateResponse(
-            "not_found.html",
-            {
-                "request": request,
-            },
-        )
-
-    if bangumi.save_path is None:
-        return templates.TemplateResponse(
-            "not_found.html",
-            {
-                "request": request,
-            },
-        )
+    if bangumi is None or bangumi.save_path is None:
+        return Response(status_code=404)
 
     episode_path = None
 
@@ -166,21 +59,8 @@ async def anime_res(request: Request, bangumi_id: int, episode_id: str):
         if file.stem == episode_id:
             episode_path = file
 
-    if episode_path is None:
-        return templates.TemplateResponse(
-            "not_found.html",
-            {
-                "request": request,
-            },
-        )
-
-    if not episode_path.exists():
-        return templates.TemplateResponse(
-            "not_found.html",
-            {
-                "request": request,
-            },
-        )
+    if episode_path is None or not episode_path.exists() or not episode_path.is_file():
+        return Response(status_code=404)
 
     file_size = episode_path.stat().st_size
     start, end = 0, file_size - 1

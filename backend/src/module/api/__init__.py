@@ -5,7 +5,6 @@ from .bangumi import router as bangumi_router
 from .config import router as config_router
 from .log import router as log_router
 from .media import router as media_router
-from ._media import router as _media_router
 from .program import router as program_router
 from .rss import router as rss_router
 from .search import router as search_router
@@ -17,7 +16,6 @@ v1 = APIRouter(prefix="/v1")
 v1.include_router(auth_router)
 v1.include_router(log_router)
 v1.include_router(media_router)
-v1.include_router(_media_router)
 v1.include_router(program_router)
 v1.include_router(bangumi_router)
 v1.include_router(config_router)
