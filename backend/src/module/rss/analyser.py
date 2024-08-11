@@ -67,6 +67,7 @@ class RSSAnalyser(TitleParser):
         self, rss: RSSItem, engine: RSSEngine, full_parse: bool = True
     ) -> list[Bangumi]:
         rss_torrents = self.get_rss_torrents(rss.url, full_parse)
+        logger.debug(f"[RSS] rss_torrents: {rss_torrents}, rss: {rss.url}")
         torrents_to_add = engine.bangumi.match_list(rss_torrents, rss.url)
         if not torrents_to_add:
             logger.debug("[RSS] No new title has been found.")
@@ -99,4 +100,3 @@ class RSSAnalyser(TitleParser):
             msg_en="Cannot parse this link.",
             msg_zh="无法解析此链接。",
         )
-
